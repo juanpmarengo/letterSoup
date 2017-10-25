@@ -9,6 +9,11 @@ struct Grid {
     char **rows;
 };
 
+struct Dict {
+    int n;
+    char **words;
+};
+
 void goToXY (int x, int y) {
     printf("%c[%d;%df", 0x1B, y, x);
 }
@@ -56,15 +61,45 @@ struct Grid readGrid (char *path) {
     return grid;
 }
 
+struct Dict readDict (char *path) {
+    char str[100], **ptr;
+    int strLen;
+    struct Dict dict;
+
+    dict.n = 0;
+    dict.words = NULL;
+
+    FILE * file;
+    file = fopen(path , "r");
+
+    if (file) {
+        while ((fscanf(file, "%s", str)) != EOF) {
+            // Realloc the 'array'
+            ptr = realloc(dict.words, (dict.n + 1) * sizeof(char*));
+
+            if (ptr) {
+                dict.words = ptr;
+                dict.n++;
+
+                // Save the word
+                strLen = strlen(str);
+
+                dict.words[dict.n - 1] = malloc(strLen * sizeof(char));
+                strcpy(dict.words[dict.n - 1], str);
+            }
+        }
+
+        fclose(file);
+    }
+
+    return dict;
+}
+
 int main () {
     struct Grid grid = readGrid("grid.txt");
+    struct Dict dict = readDict("dict.txt");
 
-    printf("%d\n", grid.width);
-    printf("%d\n", grid.height);
 
-    for (int x = 0; x < grid.height; x++) {
-        printf("%s\n", grid.rows[x]);
-    }
 
     return 0;
 }
