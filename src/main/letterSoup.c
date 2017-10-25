@@ -4,9 +4,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+#define TIME_TO_SLEEP       0.008
+
+#define ANSI_COLOR_RED      "\x1b[31m"
+#define ANSI_COLOR_GREEN    "\x1b[32m"
+#define ANSI_COLOR_YELLOW   "\x1b[33m"
+#define ANSI_COLOR_RESET    "\x1b[0m"
 
 struct Grid {
     int width;
@@ -116,119 +119,153 @@ void printGrid (struct Grid grid) {
     }
 }
 
-void filterRadialSearch (struct Grid grid, char *word, int x, int y) {
+int radialSearch (struct Grid grid, char *word, int x, int y, int direction, int offset) {
+    int result;
+
+    if (offset == strlen(word)) {
+        return 1;
+    }
+
+    switch (direction) {
+        case 0:
+            y -= 1;
+
+            break;
+        case 1:
+            y -= 1;
+            x += 1;
+
+            break;
+        case 2:
+            x += 1;
+
+            break;
+        case 3:
+            x += 1;
+            y += 1;
+
+            break;
+        case 4:
+            y += 1;
+
+            break;
+        case 5:
+            y += 1;
+            x -= 1;
+
+            break;
+        case 6:
+            x -= 1;
+
+            break;
+        case 7:
+            y -= 1;
+            x -= 1;
+
+            break;
+    }
+
+    if (grid.rows[y][x] == word[offset]) {
+        goToXY(x, y);
+        printf(ANSI_COLOR_YELLOW    "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
+
+        sleepSeconds(TIME_TO_SLEEP);
+
+        result = radialSearch(grid, word, x, y, direction, (offset + 1));
+        goToXY(x, y);
+
+        if (result == 1) {
+            printf(ANSI_COLOR_GREEN "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
+        } else {
+            printf("%c\n", grid.rows[y][x]);
+        }
+
+        return result;
+    } else {
+        goToXY(x, y);
+        printf(ANSI_COLOR_RED       "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
+
+        sleepSeconds(TIME_TO_SLEEP);
+        goToXY(x, y);
+        printf("%c\n", grid.rows[y][x]);
+
+        return 0;
+    }
+}
+
+int filterRadialSearch (struct Grid grid, char *word, int x, int y) {
     int offset = strlen(word) - 1;
 
     for (int r = 0; r < 8; r++) {
         switch (r) {
             case 0:
                 if (y - offset >= 0) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 1:
                 if (y - offset >= 0 && x + offset < grid.width) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 2:
                 if (x + offset < grid.width) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 3:
                 if (y + offset < grid.height && x + offset < grid.width) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 4:
                 if (y + offset < grid.height) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 5:
                 if (y + offset < grid.height && x - offset >= 0) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 6:
                 if (x - offset >= 0) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
             case 7:
                 if (y - offset >= 0 && x - offset >= 0) {
-                    radialSearch(grid, word, x, y, r, 1);
+                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
+                        return r;
+                    }
                 }
 
                 break;
         }
     }
-}
 
-int radialSearch (struct Grid grid, char *word, int x, int y, int direction, int offset) {
-    int result;
-
-    if (offset > strlen(word)) {
-        return 1;
-    }
-
-    switch (direction) {
-        case 0:
-            y -= offset;
-
-            break;
-        case 1:
-            y -= offset;
-            x += offset;
-
-            break;
-        case 2:
-            x += offset;
-
-            break;
-        case 3:
-            x += offset;
-            y += offset;
-
-            break;
-        case 4:
-            y += offset;
-
-            break;
-        case 5:
-            y += offset;
-            x -= offset;
-
-            break;
-        case 6:
-            x -= offset;
-
-            break;
-        case 7:
-            y -= offset;
-            x -= offset;
-
-            break;
-    }
-
-    if (grid.rows[y][x] == word[offset]) {
-        result = radialSearch(grid, word, x, y, r, offset + 1);
-
-
-    } else {
-        goToXY(x, y);
-        printf(ANSI_COLOR_RED     "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-
-        return 0;
-    }
+    return 8;
 }
 
 void solveSoup (struct Grid grid, struct Dict dict) {
@@ -238,19 +275,22 @@ void solveSoup (struct Grid grid, struct Dict dict) {
     for (int w = 0; w < dict.n; w++) {
         for (int y = 0; y < grid.height; y++) {
             for (int x = 0; x < grid.width; x++) {
-                goToXY(0, 20);
-                printf("%d %d", x, y);
-
-                goToXY(x, y);
                 if (grid.rows[y][x] == dict.words[w][0]) {
+                    goToXY(x, y);
                     printf(ANSI_COLOR_YELLOW  "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
 
-                    filterRadialSearch(grid, dict.words[w], x, y);
+                    if(filterRadialSearch(grid, dict.words[w], x, y) != 8) {
+                        goToXY(x, y);
+                        printf(ANSI_COLOR_GREEN  "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
+
+                        getchar();
+                    }
                 } else {
+                    goToXY(x, y);
                     printf(ANSI_COLOR_RED     "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
                 }
 
-                sleepSeconds(0.2);
+                sleepSeconds(TIME_TO_SLEEP);
                 goToXY(x, y);
                 printf("%c", grid.rows[y][x]);
             }
