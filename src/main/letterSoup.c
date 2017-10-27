@@ -12,7 +12,7 @@
 /*   CONSTANTES   */
 /******************/
 
-#define TIME_TO_SLEEP       0.8
+#define TIME_TO_SLEEP       0.002
 
 #define ANSI_COLOR_RED      "\x1b[31m"
 #define ANSI_COLOR_GREEN    "\x1b[32m"
@@ -67,6 +67,7 @@ void goToXY (int x, int y) {
 void goToXYPrint (int x, int y, char *str) {
     goToXY(x, y);
     printf("%s", str);
+    fflush(stdout);
 }
 
 // Limpiar pantalla me parece absolutamente asqueroso
@@ -119,6 +120,8 @@ void dibujarVentana () {
             }
         }
     }
+
+    fflush(stdout);
 }
 
 void dibujarGrilla (int columnas, int filas) {
@@ -144,7 +147,7 @@ void dibujarGrilla (int columnas, int filas) {
                 } else if (y == filas + 3) {
                     goToXYPrint(x + 1, y + 3, "\u2501\u2501");
                 } else {
-                    if (y - 11 < 10) {
+                    if (y - 2 < 10) {
                         goToXY(x + 1, y + 3);
                         printf(" %d", y - 2);
                     } else {
@@ -186,6 +189,8 @@ void dibujarGrilla (int columnas, int filas) {
             }
         }
     }
+
+    fflush(stdout);
 }
 
 void dibujarTabla (int filas, int margenIzquierdo) {
@@ -237,6 +242,8 @@ void dibujarTabla (int filas, int margenIzquierdo) {
 
         goToXYPrint(margenIzquierdo + 1, 4, "PALABRAS");
     }
+
+    fflush(stdout);
 }
 
 void mostrarSalidaVentana (char *str) {
@@ -252,158 +259,9 @@ void mostrarSalidaVentana (char *str) {
     goToXY(1, 1);
 
     printf("%s", str);
+
+    fflush(stdout);
 }
-
-/*
-int radialSearch (struct Grid grid, char *word, int x, int y, int direction, int offset) {
-    int result;
-
-    if (offset == strlen(word)) {
-        return 1;
-    }
-
-    switch (direction) {
-        case 0:
-            y -= 1;
-
-            break;
-        case 1:
-            y -= 1;
-            x += 1;
-
-            break;
-        case 2:
-            x += 1;
-
-            break;
-        case 3:
-            x += 1;
-            y += 1;
-
-            break;
-        case 4:
-            y += 1;
-
-            break;
-        case 5:
-            y += 1;
-            x -= 1;
-
-            break;
-        case 6:
-            x -= 1;
-
-            break;
-        case 7:
-            y -= 1;
-            x -= 1;
-
-            break;
-    }
-
-    if (grid.rows[y][x] == word[offset]) {
-        goToXY(x, y);
-        printf(ANSI_COLOR_YELLOW    "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-
-        sleepSeconds(TIME_TO_SLEEP);
-
-        result = radialSearch(grid, word, x, y, direction, (offset + 1));
-        goToXY(x, y);
-
-        if (result == 1) {
-            printf(ANSI_COLOR_GREEN "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-        } else {
-            printf("%c\n", grid.rows[y][x]);
-        }
-
-        return result;
-    } else {
-        goToXY(x, y);
-        printf(ANSI_COLOR_RED       "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-
-        sleepSeconds(TIME_TO_SLEEP);
-        goToXY(x, y);
-        printf("%c\n", grid.rows[y][x]);
-
-        return 0;
-    }
-}
-
-int filterRadialSearch (struct Grid grid, char *word, int x, int y) {
-    int offset = strlen(word) - 1;
-
-    for (int r = 0; r < 8; r++) {
-        switch (r) {
-            case 0:
-                if (y - offset >= 0) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 1:
-                if (y - offset >= 0 && x + offset < grid.width) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 2:
-                if (x + offset < grid.width) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 3:
-                if (y + offset < grid.height && x + offset < grid.width) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 4:
-                if (y + offset < grid.height) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 5:
-                if (y + offset < grid.height && x - offset >= 0) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 6:
-                if (x - offset >= 0) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-            case 7:
-                if (y - offset >= 0 && x - offset >= 0) {
-                    if (radialSearch(grid, word, x, y, r, 1) == 1) {
-                        return r;
-                    }
-                }
-
-                break;
-        }
-    }
-
-    return 8;
-}
-*/
 
 void mostrarSopaDeLetras (struct SopaDeLetras sopaDeLetras) {
     for (int y = 0; y < sopaDeLetras.numeroDeFilas; y++) {
@@ -413,6 +271,8 @@ void mostrarSopaDeLetras (struct SopaDeLetras sopaDeLetras) {
             printf("%s%c%s", sopaDeLetras.celdas[y][x].color, sopaDeLetras.celdas[y][x].letra, ANSI_COLOR_RESET);
         }
     }
+
+    fflush(stdout);
 }
 
 struct SopaDeLetras abrirSopaDeLetras (char *path) {
@@ -509,47 +369,49 @@ void mostrarUniverso (struct Universo universo, int margenIzquierdo) {
 
         if (universo.palabras[y].solucion) {
             if (universo.palabras[y].solucion->sentido == 8) {
-                printf("  \u2613");
+                printf("%s  \u274C%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
             } else {
-                printf("%c", universo.palabras[y].solucion->columna);
+                printf("%c", universo.palabras[y].solucion->columna + 65);
 
-                if (universo.palabras[y].solucion->fila < 10) {
-                    printf(" %d", universo.palabras[y].solucion->fila);
+                if (universo.palabras[y].solucion->fila + 1 < 10) {
+                    printf(" %d", universo.palabras[y].solucion->fila + 1);
                 } else {
-                    printf("%d", universo.palabras[y].solucion->fila);
+                    printf("%d", universo.palabras[y].solucion->fila + 1);
                 }
 
                 switch (universo.palabras[y].solucion->sentido) {
                     case 0:
-                        printf("\u2B06\u2503");
+                        printf("\u2B06");
+                        break;
+                    case 1:
+                        printf("\u2B08");
                         break;
                     case 2:
-                        printf("\u2B06\u2503");
+                        printf("\u27A1");
                         break;
                     case 3:
-                        printf("\u2B06\u2503");
+                        printf("\u2B0A");
                         break;
                     case 4:
-                        printf("\u2B06\u2503");
+                        printf("\u2B07");
                         break;
                     case 5:
-                        printf("\u2B06\u2503");
+                        printf("\u2B0B");
                         break;
                     case 6:
-                        printf("\u2B06\u2503");
+                        printf("\u2B05");
                         break;
                     case 7:
-                        printf("\u2B06\u2503");
-                        break;
-                    case 8:
-                        printf("\u2B06\u2503");
+                        printf("\u2B09");
                         break;
                 }
             }
         } else {
-            printf("  \u231B");
+            printf("%s  \u231B%s", ANSI_COLOR_YELLOW, ANSI_COLOR_RESET);
         }
     }
+
+    fflush(stdout);
 }
 
 struct Universo abrirUniverso (char *path, int margenIzquierdo) {
@@ -619,8 +481,154 @@ struct Universo leerUniverso (int margenIzquierdo) {
     return universo;
 }
 
-int buscarDirecciones (struct SopaDeLetras sopaDeLetras, int x, int y, char *palabra) {
+int buscarDireccion (struct SopaDeLetras *sopaDeLetras, int x, int y, char *palabra, int direccion, int posicion, double tiempoDePausa) {
+    int resultado = 0;
 
+    if (posicion == strlen(palabra)) {
+        return 1;
+    }
+
+    switch (direccion) {
+        case 0:
+            y -= 1;
+
+            break;
+        case 1:
+            y -= 1;
+            x += 1;
+
+            break;
+        case 2:
+            x += 1;
+
+            break;
+        case 3:
+            x += 1;
+            y += 1;
+
+            break;
+        case 4:
+            y += 1;
+
+            break;
+        case 5:
+            y += 1;
+            x -= 1;
+
+            break;
+        case 6:
+            x -= 1;
+
+            break;
+        case 7:
+            y -= 1;
+            x -= 1;
+
+            break;
+    }
+
+    if (tolower(sopaDeLetras->celdas[y][x].letra) == tolower(palabra[posicion])) {
+        goToXY(x + 5, y + 6);
+        printf("%s%c%s", ANSI_COLOR_YELLOW, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+        fflush(stdout);
+
+        sleepSeconds(tiempoDePausa);
+
+        resultado = buscarDireccion(sopaDeLetras, x, y, palabra, direccion, (posicion + 1), tiempoDePausa);
+
+        if (resultado == 1) {
+            strcpy(sopaDeLetras->celdas[y][x].color, ANSI_COLOR_GREEN);
+        }
+    } else {
+        goToXY(x + 5, y + 6);
+        printf("%s%c%s", ANSI_COLOR_RED, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+        fflush(stdout);
+
+        sleepSeconds(tiempoDePausa);
+
+        resultado = 0;
+    }
+
+    goToXY(x + 5, y + 6);
+    printf("%s%c%s", sopaDeLetras->celdas[y][x].color, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+    fflush(stdout);
+
+    return resultado;
+}
+
+int buscarDirecciones (struct SopaDeLetras *sopaDeLetras, int x, int y, char *palabra, double tiempoDePausa) {
+    int posicion = strlen(palabra) - 1;
+
+    for (int d = 0; d < 8; d++) {
+        switch (d) {
+            case 0:
+                if (y - posicion >= 0) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 1:
+                if (y - posicion >= 0 && x + posicion < sopaDeLetras->numeroDeColumnas) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 2:
+                if (x + posicion < sopaDeLetras->numeroDeColumnas) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 3:
+                if (y + posicion < sopaDeLetras->numeroDeFilas && x + posicion < sopaDeLetras->numeroDeColumnas) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 4:
+                if (y + posicion < sopaDeLetras->numeroDeFilas) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 5:
+                if (y + posicion < sopaDeLetras->numeroDeFilas && x - posicion >= 0) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 6:
+                if (x - posicion >= 0) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+            case 7:
+                if (y - posicion >= 0 && x - posicion >= 0) {
+                    if (buscarDireccion(sopaDeLetras, x, y, palabra, d, 1, tiempoDePausa) == 1) {
+                        return d;
+                    }
+                }
+
+                break;
+        }
+    }
+
+    return 8;
 }
 
 struct Palabra encontrarPalabra (struct SopaDeLetras *sopaDeLetras, struct Palabra palabra, double tiempoDePausa) {
@@ -633,12 +641,45 @@ struct Palabra encontrarPalabra (struct SopaDeLetras *sopaDeLetras, struct Palab
         for (int x = 0; x < sopaDeLetras->numeroDeColumnas; x++) {
             if (tolower(sopaDeLetras->celdas[y][x].letra) == tolower(palabra.palabra[0])) {
                 goToXY(x + 5, y + 6);
-                printf("%s%c%s\n", ANSI_COLOR_YELLOW, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                printf("%s%c%s", ANSI_COLOR_YELLOW, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                fflush(stdout);
 
-                direccion = buscarDirecciones(*sopaDeLetras, x, y, palabra.palabra);
+                direccion = buscarDirecciones(sopaDeLetras, x, y, palabra.palabra, tiempoDePausa);
+
+                if (direccion != 8) {
+                    strcpy(sopaDeLetras->celdas[y][x].color, ANSI_COLOR_GREEN);
+
+                    palabra.solucion->sentido = direccion;
+                    palabra.solucion->columna = x;
+                    palabra.solucion->fila = y;
+
+                    goToXY(x + 5, y + 6);
+                    printf("%s%c%s", sopaDeLetras->celdas[y][x].color, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                    fflush(stdout);
+
+                    sleepSeconds(tiempoDePausa);
+
+                    return palabra;
+                } else {
+                    goToXY(x + 5, y + 6);
+                    printf("%s%c%s", ANSI_COLOR_RED, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                    
+                    sleepSeconds(tiempoDePausa);
+
+                    goToXY(x + 5, y + 6);
+                    printf("%s%c%s", sopaDeLetras->celdas[y][x].color, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                    fflush(stdout);
+                }
             } else {
                 goToXY(x + 5, y + 6);
-                printf("%s%c%s\n", ANSI_COLOR_RED, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                printf("%s%c%s", ANSI_COLOR_RED, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                fflush(stdout);
+                
+                sleepSeconds(tiempoDePausa);
+
+                goToXY(x + 5, y + 6);
+                printf("%s%c%s", sopaDeLetras->celdas[y][x].color, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+                fflush(stdout);
             }
         }
     }
@@ -651,7 +692,8 @@ void encontrarSoluciones (struct SopaDeLetras sopaDeLetras, struct Universo univ
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
     for (int y = 0; y < universo.tamanioUniverso; y++) {
-        goToXYPrint(w.ws_col - 6, y + 6, "  \u21B7");
+        goToXY(w.ws_col - 6, y + 6);
+        printf("%s  \u21B7%s", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
 
         universo.palabras[y] = encontrarPalabra(&sopaDeLetras, universo.palabras[y], tiempoDePausa);
 
