@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -244,7 +245,7 @@ void mostrarSalidaVentana (char *str) {
 
     goToXY(1, 1);
 
-    for (int x = 0; x < w.ws_row - 2; x++) {
+    for (int x = 0; x < w.ws_col - 2; x++) {
         printf(" ");
     }
 
@@ -401,36 +402,6 @@ int filterRadialSearch (struct Grid grid, char *word, int x, int y) {
     }
 
     return 8;
-}
-
-void solveSoup (struct Grid grid, struct Dict dict) {
-    clearScreen();
-    printGrid(grid);
-
-    for (int w = 0; w < dict.n; w++) {
-        for (int y = 0; y < grid.height; y++) {
-            for (int x = 0; x < grid.width; x++) {
-                if (grid.rows[y][x] == dict.words[w][0]) {
-                    goToXY(x, y);
-                    printf(ANSI_COLOR_YELLOW  "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-
-                    if(filterRadialSearch(grid, dict.words[w], x, y) != 8) {
-                        goToXY(x, y);
-                        printf(ANSI_COLOR_GREEN  "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-
-                        getchar();
-                    }
-                } else {
-                    goToXY(x, y);
-                    printf(ANSI_COLOR_RED     "%c"     ANSI_COLOR_RESET "\n", grid.rows[y][x]);
-                }
-
-                sleepSeconds(TIME_TO_SLEEP);
-                goToXY(x, y);
-                printf("%c", grid.rows[y][x]);
-            }
-        }
-    }
 }
 */
 
@@ -648,37 +619,83 @@ struct Universo leerUniverso (int margenIzquierdo) {
     return universo;
 }
 
-void encontrarSoluciones (struct SopaDeLetras sopaDeLetras, struct Universo universo) {
+int buscarDirecciones (struct SopaDeLetras sopaDeLetras, int x, int y, char *palabra) {
 
+}
+
+struct Palabra encontrarPalabra (struct SopaDeLetras *sopaDeLetras, struct Palabra palabra, double tiempoDePausa) {
+    int direccion;
+
+    palabra.solucion = malloc(sizeof (struct Solucion));
+    palabra.solucion->sentido = 8;
+
+    for (int y = 0; y < sopaDeLetras->numeroDeFilas; y++) {
+        for (int x = 0; x < sopaDeLetras->numeroDeColumnas; x++) {
+            if (tolower(sopaDeLetras->celdas[y][x].letra) == tolower(palabra.palabra[0])) {
+                goToXY(x + 5, y + 6);
+                printf("%s%c%s\n", ANSI_COLOR_YELLOW, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+
+                direccion = buscarDirecciones(*sopaDeLetras, x, y, palabra.palabra);
+            } else {
+                goToXY(x + 5, y + 6);
+                printf("%s%c%s\n", ANSI_COLOR_RED, sopaDeLetras->celdas[y][x].letra, ANSI_COLOR_RESET);
+            }
+        }
+    }
+
+    return palabra;
+}
+
+void encontrarSoluciones (struct SopaDeLetras sopaDeLetras, struct Universo universo, double tiempoDePausa) {
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    for (int y = 0; y < universo.tamanioUniverso; y++) {
+        goToXYPrint(w.ws_col - 6, y + 6, "  \u21B7");
+
+        universo.palabras[y] = encontrarPalabra(&sopaDeLetras, universo.palabras[y], tiempoDePausa);
+
+        mostrarUniverso(universo, sopaDeLetras.numeroDeColumnas + 6);
+    }
 }
 
 /************/
 /*   MAIN   */
 /************/
 
-int main () {
-    char path[40];
+int main () {    
+    char path[40] = {0};
     struct SopaDeLetras sopaDeLetras;
     struct Universo universo;
 
     dibujarVentana();
 
-    /*mostrarSalidaVentana("Ingrese la ubicacion de un archivo (en caso que no se ingrese ninguno se procedera al ingreso por pantalla): ");
-    scanf("%s", path);
+    /*mostrarSalidaVentana("SOPA DE LETRAS ubicacion de un archivo o ENTER para ingreso manual: ");
 
-    if (strlen(path) > 0    ) {
+    fgets(path, 40, stdin);
+    path[strlen(path) - 1] = '\0';
+
+    if (strlen(path) > 0) {
         sopaDeLetras = abrirSopaDeLetras(path);
     } else {
         sopaDeLetras = leerSopaDeLetras();
+    }
+
+    mostrarSalidaVentana("UNIVERSO ubicacion de un archivo o ENTER para ingreso manual: ");
+
+    fgets(path, 40, stdin);
+    path[strlen(path) - 1] = '\0';
+
+    if (strlen(path) > 0) {
+        universo = abrirUniverso(path, sopaDeLetras.numeroDeColumnas + 6);
+    } else {
+        universo = leerUniverso(sopaDeLetras.numeroDeColumnas + 6);
     }*/
 
     sopaDeLetras = abrirSopaDeLetras("sopaDeLetras.txt");
-    //sopaDeLetras = leerSopaDeLetras();
-
     universo = abrirUniverso("universo.txt", sopaDeLetras.numeroDeColumnas + 6);
-    //universo = leerUniverso(sopaDeLetras.numeroDeColumnas + 6);
 
-    encontrarSoluciones(sopaDeLetras, universo);
+    encontrarSoluciones(sopaDeLetras, universo, TIME_TO_SLEEP);
 
     mostrarSalidaVentana("");
 
