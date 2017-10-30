@@ -712,7 +712,7 @@ int main () {
 
     dibujarVentana();
 
-    /*mostrarSalidaVentana("SOPA DE LETRAS ubicacion de un archivo o ENTER para ingreso manual: ");
+    mostrarSalidaVentana("SOPA DE LETRAS ubicacion de un archivo o ENTER para ingreso manual: ");
 
     fgets(path, 40, stdin);
     path[strlen(path) - 1] = '\0';
@@ -732,10 +732,7 @@ int main () {
         universo = abrirUniverso(path, sopaDeLetras.numeroDeColumnas + 6);
     } else {
         universo = leerUniverso(sopaDeLetras.numeroDeColumnas + 6);
-    }*/
-
-    sopaDeLetras = abrirSopaDeLetras("sopaDeLetras.txt");
-    universo = abrirUniverso("universo.txt", sopaDeLetras.numeroDeColumnas + 6);
+    }
 
     encontrarSoluciones(sopaDeLetras, universo, TIME_TO_SLEEP);
 
