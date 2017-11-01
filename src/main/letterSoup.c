@@ -3,115 +3,66 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <limits.h>
+// Constantes de colores para terminales ANSI
+#define ANSI_COLOR_ROJO     "\x1b[31m"
+#define ANSI_COLOR_VERDE    "\x1b[32m"
+#define ANSI_COLOR_DEFECTO  "\x1b[0m"
 
+/*
+    Definimos una estructura Solucion con tres enteros, un x e y para representar la posicion en
+    la sopa de letras, y direccion representando de 0 para arriba hasta 7 en el sentido horario.
+*/
 typedef struct {
     int x;
     int y;
     int direccion;
 } Solucion;
 
+/*
+    Definimos una estructura Palabra con un puntero a char palabra para almacenar la palabra, 
+    y un puntero a Solucion solucion representando la solucion de la sopa de letras (NULL si no
+    tiene solucion).
+*/
 typedef struct {
     char *palabra;
     Solucion *solucion;
 } Palabra;
 
+/*
+    Definimos una estructura Universo con un entero tamanioUniverso representando la cantidad de
+    palabras, y un puntero a Palabra para guardar el conjunto de palabras.
+*/
 typedef struct Universo {
     int tamanioUniverso;
     Palabra *palabras;
 } Universo;
 
+/*
+    Definimos una estructura SopaDeLetras con dos enteros, numeroDeColumnas y numeroDeFilas
+    representando las dimensiones de la sopa de letras, y un doble puntero a char celdas
+    donde guardamos las letras.
+*/
 typedef struct {
     int numeroDeColumnas;
     int numeroDeFilas;
     char **celdas;
 } SopaDeLetras;
 
+/*
+    limpiarPantalla: () -> void
+
+    Limpia la pantalla de la terminal con una llamada al sistema.
+*/
 void limpiarPantalla () {
     system("clear");
 }
 
+/*
+    leerSopaDeLetras: () -> SopaDeLetras
 
-
-SopaDeLetras abrirSopaDeLetras (char *path) {
-    int strLen;
-    char str[100];
-    SopaDeLetras sopaDeLetras;
-    char **ptr;
-
-    sopaDeLetras.numeroDeColumnas = INT_MAX;
-    sopaDeLetras.numeroDeFilas = 0;
-    sopaDeLetras.celdas = NULL;
-
-    FILE * file;
-    file = fopen(path , "r");
-
-    if (file) {
-        while ((fscanf(file, "%s", str)) != EOF) {
-            // Realloc the first dimension
-            ptr = realloc(sopaDeLetras.celdas, (sopaDeLetras.numeroDeFilas + 1) * sizeof(char *));
-
-            if (ptr) {
-                sopaDeLetras.celdas = ptr;
-
-                // Save row
-                strLen = strlen(str);
-
-                if (sopaDeLetras.numeroDeColumnas > strLen) {
-                    sopaDeLetras.numeroDeColumnas = strLen;
-                }
-
-                sopaDeLetras.celdas[sopaDeLetras.numeroDeFilas] = malloc((sopaDeLetras.numeroDeColumnas + 1) * sizeof(char));
-                
-                strcpy(sopaDeLetras.celdas[sopaDeLetras.numeroDeFilas], str);
-                sopaDeLetras.numeroDeFilas++;
-            }
-        }
-
-        fclose(file);
-    }
-
-    return sopaDeLetras;
-}
-
-struct Universo abrirUniverso (char *path) {
-    int strLen;
-    char str[100];
-    Universo universo;
-    Palabra *ptr;
-
-    universo.tamanioUniverso = 0;
-    universo.palabras = NULL;
-
-    FILE * file;
-    file = fopen(path , "r");
-
-    if (file) {
-        while ((fscanf(file, "%s", str)) != EOF) {
-            // Realloc the 'array'
-            ptr = realloc(universo.palabras, (universo.tamanioUniverso + 1) * sizeof(Palabra));
-
-            if (ptr) {
-                universo.palabras = ptr;
-
-                universo.palabras[universo.tamanioUniverso].palabra = malloc((strlen(str) + 1) * sizeof(char));
-                strcpy(universo.palabras[universo.tamanioUniverso].palabra, str);
-
-                universo.palabras[universo.tamanioUniverso].solucion = NULL;
-
-                universo.tamanioUniverso++;
-            }
-        }
-
-        fclose(file);
-    }
-
-    return universo;
-}
-
-
-
-
+    Le pide al usuario la cantidad de columnas y filas, y luego el ingreso de la sopa de letras
+    y retorna una estructura SopaDeLetras.
+*/
 SopaDeLetras leerSopaDeLetras () {
     SopaDeLetras sopaDeLetras;
 
@@ -135,7 +86,7 @@ SopaDeLetras leerSopaDeLetras () {
             if (strlen(buffer) == sopaDeLetras.numeroDeColumnas) {
                 valid = 1;
             } else {
-                printf("¡NO TIENE LA CANTIDAD DE COLUMANS INGRESADAS!\n");
+                printf("%s¡NO TIENE LA CANTIDAD DE COLUMANS INGRESADAS!%s\n", ANSI_COLOR_ROJO, ANSI_COLOR_DEFECTO);
             }
         }
 
@@ -146,6 +97,12 @@ SopaDeLetras leerSopaDeLetras () {
     return sopaDeLetras;
 }
 
+/*
+    leerUniverso: () -> Universo
+
+    Le pide al usuario la cantidad de palabras, y luego el ingreso de las mismas y retorna una
+    estructura Universo con las palabras sin solucion.
+*/
 Universo leerUniverso () {
     Universo universo;
     char buffer[100];
@@ -168,14 +125,20 @@ Universo leerUniverso () {
     return universo;
 }
 
+/*
+    mostrarUniverso: Universo -> void
+
+    Muestra por pantalla las palabras, y por cada una de ellas si encontro solucion o no, y si
+    tiene solucion muestra las coordenadas y la direccion de la misma.
+*/
 void mostrarUniverso (Universo universo) {
     char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
 
     for (int y = 0; y < universo.tamanioUniverso; y++) {
         if (universo.palabras[y].solucion) {
-            printf("\u2713 ");
+            printf("%s\u2713 %s", ANSI_COLOR_VERDE, ANSI_COLOR_DEFECTO);
         } else {
-            printf("\u274C ");
+            printf("%s\u274C %s", ANSI_COLOR_ROJO, ANSI_COLOR_DEFECTO);
         }
 
         printf("%s", universo.palabras[y].palabra);
@@ -188,6 +151,12 @@ void mostrarUniverso (Universo universo) {
     }
 }
 
+/*
+    esDireccion: (SopaDeLetras, char*, int, int, int) -> int
+
+    Busca en la SopaDeLetras, la palabra, en la posicion y direccion ingresadas y retorna 0 si
+    no la encuentra o 1 si la encuentra.
+*/
 int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int direccion) {
     int xOffset[8]  = {0, 1, 1, 1, 0, -1, -1, -1},
         yOffset[8]  = {-1, -1, 0, 1, 1, 1, 0, -1},
@@ -211,6 +180,12 @@ int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int dir
     return esDireccion(sopaDeLetras, palabra + 1, x + xOffset[direccion], y + yOffset[direccion], direccion);
 }
 
+/*
+    encontrarDireccion: (SopaDeLetras, char*, int, int) -> int
+
+    Busca en la SopaDeLetras, la palabra, en la posicion ingresada y retorna la direccion, siendo
+    0 arriba hasta 7 en sentido horario.    
+*/
 int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) {
     int strLen = strlen(palabra);
 
@@ -225,6 +200,12 @@ int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) 
     return -1;
 }
 
+/*
+    encontrarSolucion: (SopaDeLetras, char*) -> Solucion*
+
+    Busca en la SopaDeLetras, la palabra ingresada y devuelve un puntero con la solucion (NULL
+    si no hay solucion).    
+*/
 Solucion *encontrarSolucion (SopaDeLetras sopaDeLetras, char *palabra) {
     int direccion;
     Solucion *solucion;
@@ -248,6 +229,11 @@ Solucion *encontrarSolucion (SopaDeLetras sopaDeLetras, char *palabra) {
     return NULL;
 }
 
+/*
+    encontrarSolucion: (SopaDeLetras, Universo) -> Universo
+
+    Busca en la SopaDeLetras, el universo de palabras y retorna un universo con soluciones.    
+*/
 Universo resolverSopaDeLetras (SopaDeLetras sopaDeLetras, Universo universo) {
     for (int z = 0; z < universo.tamanioUniverso; z++) {
         universo.palabras[z].solucion = encontrarSolucion(sopaDeLetras, universo.palabras[z].palabra);
@@ -256,15 +242,13 @@ Universo resolverSopaDeLetras (SopaDeLetras sopaDeLetras, Universo universo) {
     return universo;
 }
 
+// Funcion main.
 int main (int argc, char const *argv[]) {
-    /*limpiarPantalla();
+    limpiarPantalla();
     SopaDeLetras sopaDeLetras   = leerSopaDeLetras();
 
     limpiarPantalla();
-    Universo universo           = leerUniverso();*/
-
-    SopaDeLetras sopaDeLetras = abrirSopaDeLetras("sopaDeLetras.txt");
-    Universo universo = abrirUniverso("universo.txt");
+    Universo universo           = leerUniverso();
 
     universo                    = resolverSopaDeLetras (sopaDeLetras, universo);
 
