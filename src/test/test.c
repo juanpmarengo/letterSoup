@@ -1,3 +1,4 @@
+#include "../main/letterSoup.h"
 #include <stdio.h>
 #include <assert.h>
 

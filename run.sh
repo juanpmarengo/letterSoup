@@ -6,7 +6,7 @@ if [ ! -d "build" ]; then
 fi
 
 if [ "$1" = "test" ]; then
-    gcc ./src/test/letterSoupTest.c -o build/output && ./build/output
+	gcc -o build/test src/main/letterSoup.c src/test/test.c && ./build/test
 else
-    gcc ./src/main/letterSoup.c -o build/output && ./build/output
+	gcc -o build/main src/main/letterSoup.c src/main/main.c && ./build/main
 fi
