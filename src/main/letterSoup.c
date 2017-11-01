@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <limits.h>
+
 typedef struct {
     int x;
     int y;
@@ -28,6 +30,87 @@ typedef struct {
 void limpiarPantalla () {
     system("clear");
 }
+
+
+
+SopaDeLetras abrirSopaDeLetras (char *path) {
+    int strLen;
+    char str[100];
+    SopaDeLetras sopaDeLetras;
+    char **ptr;
+
+    sopaDeLetras.numeroDeColumnas = INT_MAX;
+    sopaDeLetras.numeroDeFilas = 0;
+    sopaDeLetras.celdas = NULL;
+
+    FILE * file;
+    file = fopen(path , "r");
+
+    if (file) {
+        while ((fscanf(file, "%s", str)) != EOF) {
+            // Realloc the first dimension
+            ptr = realloc(sopaDeLetras.celdas, (sopaDeLetras.numeroDeFilas + 1) * sizeof(char *));
+
+            if (ptr) {
+                sopaDeLetras.celdas = ptr;
+
+                // Save row
+                strLen = strlen(str);
+
+                if (sopaDeLetras.numeroDeColumnas > strLen) {
+                    sopaDeLetras.numeroDeColumnas = strLen;
+                }
+
+                sopaDeLetras.celdas[sopaDeLetras.numeroDeFilas] = malloc((sopaDeLetras.numeroDeColumnas + 1) * sizeof(char));
+                
+                strcpy(sopaDeLetras.celdas[sopaDeLetras.numeroDeFilas], str);
+                sopaDeLetras.numeroDeFilas++;
+            }
+        }
+
+        fclose(file);
+    }
+
+    return sopaDeLetras;
+}
+
+struct Universo abrirUniverso (char *path) {
+    int strLen;
+    char str[100];
+    Universo universo;
+    Palabra *ptr;
+
+    universo.tamanioUniverso = 0;
+    universo.palabras = NULL;
+
+    FILE * file;
+    file = fopen(path , "r");
+
+    if (file) {
+        while ((fscanf(file, "%s", str)) != EOF) {
+            // Realloc the 'array'
+            ptr = realloc(universo.palabras, (universo.tamanioUniverso + 1) * sizeof(Palabra));
+
+            if (ptr) {
+                universo.palabras = ptr;
+
+                universo.palabras[universo.tamanioUniverso].palabra = malloc((strlen(str) + 1) * sizeof(char));
+                strcpy(universo.palabras[universo.tamanioUniverso].palabra, str);
+
+                universo.palabras[universo.tamanioUniverso].solucion = NULL;
+
+                universo.tamanioUniverso++;
+            }
+        }
+
+        fclose(file);
+    }
+
+    return universo;
+}
+
+
+
 
 SopaDeLetras leerSopaDeLetras () {
     SopaDeLetras sopaDeLetras;
@@ -86,7 +169,46 @@ Universo leerUniverso () {
 }
 
 void mostrarUniverso (Universo universo) {
+    char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
 
+    for (int y = 0; y < universo.tamanioUniverso; y++) {
+        if (universo.palabras[y].solucion) {
+            printf("\u2713 ");
+        } else {
+            printf("\u274C ");
+        }
+
+        printf("%s", universo.palabras[y].palabra);
+
+        if (universo.palabras[y].solucion) {
+            printf(" (x: %d y: %d) %s", (universo.palabras[y].solucion)->x, (universo.palabras[y].solucion)->y, arrows[(universo.palabras[y].solucion)->direccion]);
+        }
+
+        printf("\n");
+    }
+}
+
+int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int direccion) {
+    int xOffset[8]  = {0, 1, 1, 1, 0, -1, -1, -1},
+        yOffset[8]  = {-1, -1, 0, 1, 1, 1, 0, -1},
+        strLen      = strlen(palabra);
+
+    if (strLen == 0) {
+        return 1;
+    }
+
+    if (tolower(sopaDeLetras.celdas[y][x]) != tolower(palabra[0])) {
+        return 0;
+    }
+
+    if (0 > x + (strLen - 1) * xOffset[direccion] ||
+        sopaDeLetras.numeroDeColumnas <= x + (strLen - 1) * xOffset[direccion] ||
+        0 > y + (strLen - 1) * yOffset[direccion] ||
+        sopaDeLetras.numeroDeFilas <= y + (strLen - 1) * yOffset[direccion]) {
+        return 0;
+    }
+
+    return esDireccion(sopaDeLetras, palabra + 1, x + xOffset[direccion], y + yOffset[direccion], direccion);
 }
 
 int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) {
@@ -94,9 +216,13 @@ int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) 
 
     for (int l = 0; l < strLen; l++) {
         for (int d = 0; d < 8; d++) {
-            
+            if (esDireccion(sopaDeLetras, palabra, x, y, d)) {
+                return d;
+            }
         }
     }
+
+    return -1;
 }
 
 Solucion *encontrarSolucion (SopaDeLetras sopaDeLetras, char *palabra) {
@@ -132,19 +258,18 @@ Universo resolverSopaDeLetras (SopaDeLetras sopaDeLetras, Universo universo) {
 
 int main (int argc, char const *argv[]) {
     /*limpiarPantalla();
-    SopaDeLetras sopaDeLetras   = leerSopaDeLetras();*/
+    SopaDeLetras sopaDeLetras   = leerSopaDeLetras();
 
     limpiarPantalla();
-    Universo universo           = leerUniverso();
+    Universo universo           = leerUniverso();*/
 
-    for (int x = 0; x < universo.tamanioUniverso; x++) {
-        printf("%s\n", universo.palabras[x].palabra);
-    }
+    SopaDeLetras sopaDeLetras = abrirSopaDeLetras("sopaDeLetras.txt");
+    Universo universo = abrirUniverso("universo.txt");
 
-    /*universo                    = resolverSopaDeLetras (sopaDeLetras, universo);
+    universo                    = resolverSopaDeLetras (sopaDeLetras, universo);
 
     limpiarPantalla();
-    mostrarUniverso(universo);*/
+    mostrarUniverso(universo);
 
     return 0;
 }
