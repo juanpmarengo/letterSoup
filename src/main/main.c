@@ -1,16 +1,16 @@
 #include "letterSoup.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-// Constantes de colores para terminales ANSI
-#ifndef WINDOWS
-    #define COLOR_ROJO     "\x1b[31m"
-    #define COLOR_VERDE    "\x1b[32m"
-    #define COLOR_DEFECTO  "\x1b[0m"
-#else
+#ifdef _WIN32
+    #define CLEAR "cls"
     #define COLOR_ROJO     ""
     #define COLOR_VERDE    ""
     #define COLOR_DEFECTO  ""
+#else
+    #define CLEAR "clear"
+    #define COLOR_ROJO     "\x1b[31m"
+    #define COLOR_VERDE    "\x1b[32m"
+    #define COLOR_DEFECTO  "\x1b[0m"
 #endif
 
 /*
@@ -19,11 +19,7 @@
     Limpia la pantalla de la terminal con una llamada al sistema.
 */
 void limpiarPantalla () {
-    #ifdef WINDOWS
-        system("cls");
-    #else
-        system ("clear");
-    #endif
+    system(CLEAR);
 }
 
 /*
@@ -103,17 +99,23 @@ Universo leerUniverso () {
     tiene solucion muestra las coordenadas y la direccion de la misma.
 */
 void mostrarUniverso (Universo universo) {
-    char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
+    #ifdef _WIN32
+        char arrows[8][17] = {"Arriba\0", "Arriba-Derecha\0", "Derecha\0", "Abajo-Derecha\0", "Abajo\0", "Abajo-Izquierda\0", "Izquierda\0", "Arriba-Izquierda\0"};
+        char checks[2][17] = {"Se encuentra!\0", "No se encuentra.\0"};
+    #else
+        char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
+        char checks[2][2] = {"\u2713\0", "\u274C\0"};
+    #endif
 
     int y;
     for (y = 0; y < universo.tamanioUniverso; y++) {
+        printf("%s\t", universo.palabras[y].palabra);
+        
         if (universo.palabras[y].solucion) {
-            printf("%s\u2713 %s", COLOR_VERDE, COLOR_DEFECTO);
+            printf("%s%s %s", COLOR_VERDE, checks[0], COLOR_DEFECTO);
         } else {
-            printf("%s\u274C %s", COLOR_ROJO, COLOR_DEFECTO);
+            printf("%s%s %s", COLOR_ROJO, checks[1], COLOR_DEFECTO);
         }
-
-        printf("%s", universo.palabras[y].palabra);
 
         if (universo.palabras[y].solucion) {
             printf(" (x: %d y: %d) %s", (universo.palabras[y].solucion)->x, (universo.palabras[y].solucion)->y, arrows[(universo.palabras[y].solucion)->direccion]);

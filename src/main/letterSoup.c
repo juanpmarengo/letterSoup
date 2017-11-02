@@ -30,7 +30,7 @@ int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int dir
     encontrarDireccion: (SopaDeLetras, char*, int, int) -> int
 
     Busca en la SopaDeLetras, la palabra, en la posicion ingresada y retorna la direccion, siendo
-    0 arriba hasta 7 en sentido horario. Si no la encuentra retorna -1
+    0 hacia arriba hasta 7 en sentido horario. Si no la encuentra retorna -1
 */
 int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) {
     int d;
