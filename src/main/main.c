@@ -38,10 +38,10 @@ SopaDeLetras leerSopaDeLetras () {
     scanf("%d", &(sopaDeLetras.numeroDeFilas));
 
     char buffer[sopaDeLetras.numeroDeFilas + 1];
-    int valid;
+    int valid, y;
+
     sopaDeLetras.celdas = malloc(sopaDeLetras.numeroDeFilas * sizeof(char *));
 
-    int y;
     for (y = 0; y < sopaDeLetras.numeroDeFilas; y++) {
         valid = 0;
 
@@ -72,13 +72,13 @@ SopaDeLetras leerSopaDeLetras () {
 Universo leerUniverso () {
     Universo universo;
     char buffer[100];
+    int x;
 
     printf("Ingrese la cantiad de palabras:\n");
     scanf("%d", &(universo.tamanioUniverso));
 
     universo.palabras = malloc(universo.tamanioUniverso * sizeof(Palabra));
 
-    int x;
     for (x = 0; x < universo.tamanioUniverso; x++) {
         printf("Ingrese la palabra %d: ", x + 1);
         scanf("%s", buffer);
@@ -104,10 +104,11 @@ void mostrarUniverso (Universo universo) {
         char checks[2][17] = {"Se encuentra!\0", "No se encuentra.\0"};
     #else
         char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
-        char checks[2][2] = {"\u2713\0", "\u274C\0"};
+        char checks[2][8] = {"\u2713\0", "\u274C\0"};
     #endif
 
     int y;
+
     for (y = 0; y < universo.tamanioUniverso; y++) {
         printf("%s\t", universo.palabras[y].palabra);
         

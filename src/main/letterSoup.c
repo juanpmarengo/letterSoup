@@ -19,7 +19,8 @@ int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int dir
         direccion < 0 || direccion > 7 ||
         0 > x || sopaDeLetras.numeroDeColumnas <= x ||
         0 > y || sopaDeLetras.numeroDeFilas <= y ||
-        tolower(sopaDeLetras.celdas[y][x]) != tolower(palabra[0])) {
+        tolower(sopaDeLetras.celdas[y][x]) != tolower(palabra[0])
+    ) {
         return 0;
     }
 
@@ -34,6 +35,7 @@ int esDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y, int dir
 */
 int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) {
     int d;
+    
     for (d = 0; d < 8; d++) {
         if (esDireccion(sopaDeLetras, palabra, x, y, d)) {
             return d;
@@ -50,10 +52,9 @@ int encontrarDireccion (SopaDeLetras sopaDeLetras, char *palabra, int x, int y) 
     si no hay solucion).    
 */
 Solucion *encontrarSolucion (SopaDeLetras sopaDeLetras, char *palabra) {
-    int direccion;
+    int direccion, y, x;
     Solucion *solucion;
 
-    int y, x;
     for (y = 0; y < sopaDeLetras.numeroDeFilas; y++) {
         for (x = 0; x < sopaDeLetras.numeroDeColumnas; x++) {
             direccion = encontrarDireccion (sopaDeLetras, palabra, x, y);
@@ -80,6 +81,7 @@ Solucion *encontrarSolucion (SopaDeLetras sopaDeLetras, char *palabra) {
 */
 Universo resolverSopaDeLetras (SopaDeLetras sopaDeLetras, Universo universo) {
     int z;
+
     for (z = 0; z < universo.tamanioUniverso; z++) {
         universo.palabras[z].solucion = encontrarSolucion(sopaDeLetras, universo.palabras[z].palabra);
     }
