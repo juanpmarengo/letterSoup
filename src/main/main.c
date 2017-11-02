@@ -1,10 +1,17 @@
 #include "letterSoup.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 // Constantes de colores para terminales ANSI
-#define ANSI_COLOR_ROJO     "\x1b[31m"
-#define ANSI_COLOR_VERDE    "\x1b[32m"
-#define ANSI_COLOR_DEFECTO  "\x1b[0m"
+#ifndef WINDOWS
+    #define COLOR_ROJO     "\x1b[31m"
+    #define COLOR_VERDE    "\x1b[32m"
+    #define COLOR_DEFECTO  "\x1b[0m"
+#else
+    #define COLOR_ROJO     ""
+    #define COLOR_VERDE    ""
+    #define COLOR_DEFECTO  ""
+#endif
 
 /*
     limpiarPantalla: () -> void
@@ -12,7 +19,11 @@
     Limpia la pantalla de la terminal con una llamada al sistema.
 */
 void limpiarPantalla () {
-    system ("clear");
+    #ifdef WINDOWS
+        system("cls");
+    #else
+        system ("clear");
+    #endif
 }
 
 /*
@@ -34,7 +45,8 @@ SopaDeLetras leerSopaDeLetras () {
     int valid;
     sopaDeLetras.celdas = malloc(sopaDeLetras.numeroDeFilas * sizeof(char *));
 
-    for (int y = 0; y < sopaDeLetras.numeroDeFilas; y++) {
+    int y;
+    for (y = 0; y < sopaDeLetras.numeroDeFilas; y++) {
         valid = 0;
 
         while (valid == 0) {
@@ -44,7 +56,7 @@ SopaDeLetras leerSopaDeLetras () {
             if (strlen(buffer) == sopaDeLetras.numeroDeColumnas) {
                 valid = 1;
             } else {
-                printf("%s¡NO TIENE LA CANTIDAD DE COLUMANS INGRESADAS!%s\n", ANSI_COLOR_ROJO, ANSI_COLOR_DEFECTO);
+                printf("%s¡NO TIENE LA CANTIDAD DE COLUMANS INGRESADAS!%s\n", COLOR_ROJO, COLOR_DEFECTO);
             }
         }
 
@@ -70,7 +82,8 @@ Universo leerUniverso () {
 
     universo.palabras = malloc(universo.tamanioUniverso * sizeof(Palabra));
 
-    for (int x = 0; x < universo.tamanioUniverso; x++) {
+    int x;
+    for (x = 0; x < universo.tamanioUniverso; x++) {
         printf("Ingrese la palabra %d: ", x + 1);
         scanf("%s", buffer);
 
@@ -92,11 +105,12 @@ Universo leerUniverso () {
 void mostrarUniverso (Universo universo) {
     char arrows[8][8] = {"\u2B06", "\u2B08", "\u27A1", "\u2B0A", "\u2B07", "\u2B0B", "\u2B05", "\u2B09"};
 
-    for (int y = 0; y < universo.tamanioUniverso; y++) {
+    int y;
+    for (y = 0; y < universo.tamanioUniverso; y++) {
         if (universo.palabras[y].solucion) {
-            printf("%s\u2713 %s", ANSI_COLOR_VERDE, ANSI_COLOR_DEFECTO);
+            printf("%s\u2713 %s", COLOR_VERDE, COLOR_DEFECTO);
         } else {
-            printf("%s\u274C %s", ANSI_COLOR_ROJO, ANSI_COLOR_DEFECTO);
+            printf("%s\u274C %s", COLOR_ROJO, COLOR_DEFECTO);
         }
 
         printf("%s", universo.palabras[y].palabra);
