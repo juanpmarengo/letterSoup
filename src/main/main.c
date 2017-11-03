@@ -22,6 +22,7 @@ void limpiarPantalla () {
     system(CLEAR);
 }
 
+
 /*
     leerSopaDeLetras: () -> SopaDeLetras
 
@@ -63,11 +64,13 @@ SopaDeLetras leerSopaDeLetras () {
     return sopaDeLetras;
 }
 
+
 /*
     leerUniverso: () -> Universo
 
-    Le pide al usuario la cantidad de palabras, y luego el ingreso de las mismas y retorna una
-    estructura Universo con las palabras sin solucion.
+    Le pide al usuario la cantidad de palabras y el ingreso de las mismas, y retorna una
+    estructura Universo con las palabras ingresadas, cuyas soluciones fueron inicializadas como NULL
+    (ya que esta es la estructura pre-solucion).
 */
 Universo leerUniverso () {
     Universo universo;
@@ -92,11 +95,12 @@ Universo leerUniverso () {
     return universo;
 }
 
+
 /*
     mostrarUniverso: Universo -> void
 
-    Muestra por pantalla las palabras, y por cada una de ellas si encontro solucion o no, y si
-    tiene solucion muestra las coordenadas y la direccion de la misma.
+    Muestra por pantalla las palabras y, por cada una de ellas, si ha encontrado solucion. Si
+    la palabra tiene solucion, muestra las coordenadas de origen y la direccion de la misma.
 */
 void mostrarUniverso (Universo universo) {
     #ifdef _WIN32
@@ -125,6 +129,7 @@ void mostrarUniverso (Universo universo) {
         printf("\n");
     }
 }
+
 
 // Funcion main.
 int main (int argc, char const *argv[]) {
