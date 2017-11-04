@@ -1,3 +1,9 @@
+/*
+    Trabajo Practico C - Programacion II - LCC2017
+    Marengo, Juan Pablo
+    Moreno, Rodrigo
+*/
+
 #ifndef LETTER_SOUP_H_INCLUDED
 #define LETTER_SOUP_H_INCLUDED
 

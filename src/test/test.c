@@ -1,8 +1,15 @@
+/*
+    Trabajo Practico C - Programacion II - LCC2017
+    Marengo, Juan Pablo
+    Moreno, Rodrigo
+*/
+
 #ifdef _WIN32
     #include "..\main\letterSoup.h"
 #else
     #include "../main/letterSoup.h"
 #endif
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -135,20 +142,20 @@ int main () {
 
 
     // Buscando el universo u2 en la sopa s2
-    Universo uresuelto = resolverSopaDeLetras(s2, u2);
-    assert(uresuelto.palabras[0].solucion->x == 4);
-    assert(uresuelto.palabras[0].solucion->y == 0);
-    assert(uresuelto.palabras[0].solucion->direccion == 4);
+    Universo uResuelto = resolverSopaDeLetras(s2, u2);
+    assert(uResuelto.palabras[0].solucion->x == 4);
+    assert(uResuelto.palabras[0].solucion->y == 0);
+    assert(uResuelto.palabras[0].solucion->direccion == 4);
 
-    assert(uresuelto.palabras[1].solucion == NULL);
+    assert(uResuelto.palabras[1].solucion == NULL);
 
-    assert(uresuelto.palabras[2].solucion->x == 0);
-    assert(uresuelto.palabras[2].solucion->y == 0);
-    assert(uresuelto.palabras[2].solucion->direccion == 3);
+    assert(uResuelto.palabras[2].solucion->x == 0);
+    assert(uResuelto.palabras[2].solucion->y == 0);
+    assert(uResuelto.palabras[2].solucion->direccion == 3);
 
-    assert(uresuelto.palabras[3].solucion->x == 5);
-    assert(uresuelto.palabras[3].solucion->y == 6);
-    assert(uresuelto.palabras[3].solucion->direccion == 7);
+    assert(uResuelto.palabras[3].solucion->x == 5);
+    assert(uResuelto.palabras[3].solucion->y == 6);
+    assert(uResuelto.palabras[3].solucion->direccion == 7);
 
     // Fin de los tests
 

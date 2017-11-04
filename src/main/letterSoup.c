@@ -1,3 +1,9 @@
+/*
+    Trabajo Practico C - Programacion II - LCC2017
+    Marengo, Juan Pablo
+    Moreno, Rodrigo
+*/
+
 #include "letterSoup.h"
 
 /*

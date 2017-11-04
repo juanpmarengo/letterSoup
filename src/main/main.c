@@ -1,6 +1,14 @@
+/*
+    Trabajo Practico C - Programacion II - LCC2017
+    Marengo, Juan Pablo
+    Moreno, Rodrigo
+*/
+
+
 #include "letterSoup.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 #ifdef _WIN32
     #define CLEAR "cls"
     #define COLOR_ROJO     ""
